@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Dark theme (default) ─────────────────────────────────── */
+:root {
+  --color-canvas:       #080f1e;
+  --color-surface:      #0d1829;
+  --color-raised:       #122035;
+  --color-line:         #1a2f47;
+  --color-ink:          #dde8f5;
+  --color-muted:        #4d7498;
+  --color-accent:       #3b82f6;
+  --color-accent-hover: #2563eb;
+  --shadow-card:        0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-card-hover:  0 4px 12px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.2);
+}
+
+/* ── Light theme ──────────────────────────────────────────── */
+.light {
+  --color-canvas:       #f0f5fb;
+  --color-surface:      #ffffff;
+  --color-raised:       #f7fafd;
+  --color-line:         #d4e0ee;
+  --color-ink:          #0d1829;
+  --color-muted:        #6b8faf;
+  --color-accent:       #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --shadow-card:        0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.05);
+  --shadow-card-hover:  0 4px 12px rgba(0,0,0,0.12), 0 0 0 1px rgba(37,99,235,0.25);
+}
+
+/* ── Base resets ──────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Tag accent borders ───────────────────────────────────── */
+.tag-border-work     { border-left-color: #3b82f6; }
+.tag-border-learning { border-left-color: #8b5cf6; }
+.tag-border-personal { border-left-color: #ec4899; }
+.tag-border-health   { border-left-color: #10b981; }
+
+/* ── Tag chip colors ──────────────────────────────────────── */
+.tag-chip-work     { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.tag-chip-learning { background: rgba(139,92,246,0.12); color: #a78bfa; }
+.tag-chip-personal { background: rgba(236,72,153,0.12); color: #f472b6; }
+.tag-chip-health   { background: rgba(16,185,129,0.12); color: #34d399; }
+
+.light .tag-chip-work     { background: rgba(37,99,235,0.1);  color: #1d4ed8; }
+.light .tag-chip-learning { background: rgba(109,40,217,0.1); color: #6d28d9; }
+.light .tag-chip-personal { background: rgba(190,24,93,0.1);  color: #be185d; }
+.light .tag-chip-health   { background: rgba(4,120,87,0.1);   color: #047857; }
+
+/* ── Status glow rings ────────────────────────────────────── */
+.glow-doing {
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.35), 0 0 12px rgba(59,130,246,0.15);
+}
+.glow-zombie {
+  box-shadow: 0 0 0 1px rgba(217,119,6,0.45), 0 0 16px rgba(217,119,6,0.1);
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* ── Focus ring ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

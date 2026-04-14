@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --yes)",
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --yes --name flowboard)",
+      "Read(//d/MyProjects/**)",
+      "Bash(npx create-next-app@14 flowboard-tmp --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --yes)",
+      "Bash(npm install:*)",
+      "Bash(cp:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(python3 -c \" import json path = r'C:/Users/dell xps/.claude/projects/D--MyProjects-FlowBoard/6e221923-aed0-4788-9cf5-98540c5bc127.jsonl' with open\\(path, 'r', encoding='utf-8'\\) as f: for line in f: try: obj = json.loads\\(line\\) content = json.dumps\\(obj\\) if 'ier 2' in content or 'ier2' in content: idx = content.lower\\(\\).find\\('ier 2'\\) if idx == -1: idx = content.lower\\(\\).find\\('ier2'\\) print\\(content[max\\(0,idx-100\\):idx+800]\\) print\\('==='\\) except: pass \")",
+      "Bash(python3:*)",
+      "Bash(grep -o 'Tier 2[^\\\\\\\\]*' \"C:/Users/dell xps/.claude/projects/D--MyProjects-FlowBoard/6e221923-aed0-4788-9cf5-98540c5bc127.jsonl\")",
+      "Bash(grep -o 'Tier 2 — Good[^\"\\\\\\\\n]*' \"C:/Users/dell xps/.claude/projects/D--MyProjects-FlowBoard/6e221923-aed0-4788-9cf5-98540c5bc127.jsonl\")"
+    ]
+  }
+}

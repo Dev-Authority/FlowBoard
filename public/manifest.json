@@ -1,0 +1,42 @@
+{
+  "name": "FlowBoard",
+  "short_name": "FlowBoard",
+  "description": "Anti-procrastination dashboard — make procrastination visible and uncomfortable.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity"],
+  "shortcuts": [
+    {
+      "name": "Board",
+      "short_name": "Board",
+      "description": "Open today's task board",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Display",
+      "short_name": "Display",
+      "description": "Ambient overhead monitor",
+      "url": "/display",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}
