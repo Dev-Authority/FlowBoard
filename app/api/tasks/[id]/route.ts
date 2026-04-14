@@ -35,6 +35,10 @@ export async function PATCH(
       subtasks, date,
     } = body;
 
+    if (!/^[a-f\d]{24}$/i.test(params.id)) {
+      return NextResponse.json({ error: 'Invalid task id' }, { status: 400 });
+    }
+
     const task = await Task.findById(params.id);
     if (!task) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
@@ -181,6 +185,9 @@ export async function DELETE(
 ) {
   try {
     await connectDB();
+    if (!/^[a-f\d]{24}$/i.test(params.id)) {
+      return NextResponse.json({ error: 'Invalid task id' }, { status: 400 });
+    }
     const task = await Task.findById(params.id);
     if (!task) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });

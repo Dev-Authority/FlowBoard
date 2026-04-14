@@ -19,7 +19,7 @@ export async function PATCH(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const allowed = ['theme', 'eveningReminderTime', 'morningReminderTime'];
+    const allowed = ['theme', 'eveningReminderTime', 'morningReminderTime', 'tagLimits'];
     const update: Record<string, unknown> = {};
     for (const key of allowed) {
       if (body[key] !== undefined) update[key] = body[key];

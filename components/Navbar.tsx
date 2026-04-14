@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from '@/components/ThemeProvider';
 
 const links = [
@@ -32,9 +32,16 @@ function MoonIcon() {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router   = useRouter();
   const { theme, toggle } = useTheme();
 
   if (pathname === '/display') return null;
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <nav
@@ -99,14 +106,26 @@ export default function Navbar() {
           border: '1px solid var(--color-line)',
         }}
         title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.color = 'var(--color-ink)';
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.color = 'var(--color-muted)';
-        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-ink)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-muted)'; }}
       >
         {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      </button>
+
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className="ml-1 shrink-0 px-2.5 h-8 rounded-lg text-xs font-medium transition-all duration-150"
+        style={{
+          background: 'var(--color-raised)',
+          color: 'var(--color-muted)',
+          border: '1px solid var(--color-line)',
+        }}
+        title="Sign out"
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#f87171'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--color-muted)'; }}
+      >
+        Sign out
       </button>
     </nav>
   );

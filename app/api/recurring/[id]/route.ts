@@ -10,6 +10,9 @@ export async function PATCH(
 ) {
   try {
     await connectDB();
+    if (!/^[a-f\d]{24}$/i.test(params.id)) {
+      return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
+    }
     const body = await req.json();
     const { text, size, tag, frequency, frequencyValue, isActive } = body;
 
@@ -42,6 +45,9 @@ export async function DELETE(
 ) {
   try {
     await connectDB();
+    if (!/^[a-f\d]{24}$/i.test(params.id)) {
+      return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
+    }
 
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
