@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Task, RecurringTask, TaskTag, TaskSize } from '@/lib/types';
 import AddTaskForm from '@/components/AddTaskForm';
+import ConfirmModal from '@/components/ConfirmModal';
 
 function localStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -71,7 +72,8 @@ export default function PlanPage() {
   const [intentionSaved, setIntentionSaved] = useState(false);
 
   // ── Tomorrow data ─────────────────────────────────────────────
-  const [tomorrowTasks, setTomorrowTasks] = useState<Task[]>([]);
+  const [tomorrowTasks,  setTomorrowTasks]  = useState<Task[]>([]);
+  const [deleteTarget,   setDeleteTarget]   = useState<Task | null>(null);
   const [autoTasks,     setAutoTasks]     = useState<RecurringTask[]>([]);
 
   const fetchAll = useCallback(async () => {
@@ -133,9 +135,12 @@ export default function PlanPage() {
     fetchAll();
   };
 
-  const handleDeleteTomorrow = async (task: Task) => {
-    if (!confirm(`Remove "${task.text}" from tomorrow?`)) return;
-    await fetch(`/api/tasks/${task._id}`, { method: 'DELETE' });
+  const handleDeleteTomorrow = (task: Task) => setDeleteTarget(task);
+
+  const confirmDeleteTomorrow = async () => {
+    if (!deleteTarget) return;
+    await fetch(`/api/tasks/${deleteTarget._id}`, { method: 'DELETE' });
+    setDeleteTarget(null);
     fetchAll();
   };
 
@@ -151,6 +156,16 @@ export default function PlanPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-canvas)' }}>
+      {deleteTarget && (
+        <ConfirmModal
+          title="Remove from tomorrow"
+          message={deleteTarget.text}
+          detail="This only removes it from tomorrow's plan. The task won't be carried elsewhere."
+          confirmLabel="Remove"
+          onConfirm={confirmDeleteTomorrow}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
 
         <div>

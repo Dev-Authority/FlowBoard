@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import RecurringTask from '@/models/RecurringTask';
+import Task from '@/models/Task';
 
 // PATCH /api/recurring/[id]
 export async function PATCH(
@@ -33,13 +34,24 @@ export async function PATCH(
 }
 
 // DELETE /api/recurring/[id]
+// Deletes the recurring template AND all generated task instances for today
+// and future dates. Past instances are intentionally kept for stats/history.
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     await connectDB();
-    const task = await RecurringTask.findByIdAndDelete(params.id);
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+    const [task] = await Promise.all([
+      RecurringTask.findByIdAndDelete(params.id),
+      // Delete all instances on today or any future date
+      Task.deleteMany({ recurringId: params.id, date: { $gte: todayStr } }),
+    ]);
+
     if (!task) {
       return NextResponse.json({ error: 'Recurring task not found' }, { status: 404 });
     }

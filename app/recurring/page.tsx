@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { RecurringTask, TaskTag, TaskSize, Frequency } from '@/lib/types';
+import ConfirmModal from '@/components/ConfirmModal';
 
 function localDateStr(): string {
   const d = new Date();
@@ -37,9 +38,10 @@ function freqLabel(t: RecurringTask): string {
 }
 
 export default function RecurringPage() {
-  const [tasks,     setTasks]     = useState<RecurringTask[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [showForm,  setShowForm]  = useState(false);
+  const [tasks,       setTasks]       = useState<RecurringTask[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [showForm,    setShowForm]    = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<RecurringTask | null>(null);
 
   // New task form
   const [text,      setText]      = useState('');
@@ -85,12 +87,14 @@ export default function RecurringPage() {
     setShowForm(false);
     fetchTasks();
 
-    // Immediately generate today's instance and prefill future boards/calendar.
-    // Clear the prefill dedup key so the board will re-run it next visit.
+    // Immediately generate today's instance then prefill future boards/calendar.
+    // Sequential: generate must finish first so lastGeneratedDate is written before
+    // prefill reads it — otherwise both can produce tasks for the same date.
     const today = localDateStr();
     localStorage.removeItem(`fb_prefilled_${today}`);
-    fetch(`/api/recurring/generate?date=${today}`).catch(() => {});
-    fetch('/api/recurring/prefill').catch(() => {});
+    fetch(`/api/recurring/generate?date=${today}`)
+      .then(() => fetch(`/api/recurring/prefill?date=${today}`))
+      .catch(() => {});
   };
 
   const toggleActive = async (t: RecurringTask) => {
@@ -102,9 +106,10 @@ export default function RecurringPage() {
     fetchTasks();
   };
 
-  const handleDelete = async (t: RecurringTask) => {
-    if (!confirm(`Delete "${t.text}"?`)) return;
-    await fetch(`/api/recurring/${t._id}`, { method: 'DELETE' });
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    await fetch(`/api/recurring/${deleteTarget._id}`, { method: 'DELETE' });
+    setDeleteTarget(null);
     fetchTasks();
   };
 
@@ -129,6 +134,16 @@ export default function RecurringPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-canvas)' }}>
+      {deleteTarget && (
+        <ConfirmModal
+          title="Delete recurring task"
+          message={deleteTarget.text}
+          detail="This will also remove all scheduled instances from today onwards. Past completed instances are kept."
+          confirmLabel="Delete"
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
 
         {/* ── Header ─────────────────────────────────────── */}
@@ -309,7 +324,7 @@ export default function RecurringPage() {
                       : { background: 'var(--color-raised)', color: 'var(--color-muted)', border: '1px solid var(--color-line)' }}>
                     {task.isActive ? 'Active' : 'Paused'}
                   </button>
-                  <button onClick={() => handleDelete(task)}
+                  <button onClick={() => setDeleteTarget(task)}
                     className="text-lg px-1 transition-colors"
                     style={{ color: 'var(--color-muted)' }}
                     onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#ef4444'}

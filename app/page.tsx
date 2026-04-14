@@ -86,16 +86,19 @@ export default function BoardPage() {
 
   // Recurring: generate today on every board load (fast + idempotent, passes local
   // date to avoid UTC mismatch); prefill future 30 days once per day.
+  // generate must complete BEFORE prefill so lastGeneratedDate is up-to-date
+  // when prefill simulates occurrences — otherwise the two can produce the same date.
   useEffect(() => {
     const fillKey = `fb_prefilled_${today}`;
     fetch(`/api/recurring/generate?date=${today}`)
-      .then(() => fetchTasks())
+      .then(() => {
+        fetchTasks();
+        if (!localStorage.getItem(fillKey)) {
+          return fetch(`/api/recurring/prefill?date=${today}`)
+            .then(() => localStorage.setItem(fillKey, '1'));
+        }
+      })
       .catch(() => {});
-    if (!localStorage.getItem(fillKey)) {
-      fetch('/api/recurring/prefill')
-        .then(() => localStorage.setItem(fillKey, '1'))
-        .catch(() => {});
-    }
   }, [today, fetchTasks]);
 
   useEffect(() => { fetchTasks(); fetchStats(); }, [fetchTasks, fetchStats]);
