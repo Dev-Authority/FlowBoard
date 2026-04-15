@@ -9,16 +9,28 @@ function localDate(): string {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
+function localYesterday(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 // GET /api/tasks/frog — returns the single most-avoided unfinished task
 export async function GET() {
   try {
     await connectDB();
-    const today = localDate();
+    const today     = localDate();
+    const yesterday = localYesterday();
 
     const sel = '_id text tag size date status postponeCount';
 
+    // Only surface tasks from today or yesterday (what's on the board).
+    // Tasks from older dates are off the board and should not trigger the frog.
+    const dateFilter = { date: { $gte: yesterday, $lte: today } };
+
     // Primary: most postponed unfinished task
     const mostPostponed = await Task.findOne({
+      ...dateFilter,
       status: { $ne: 'done' },
       postponeCount: { $gt: 0 },
     }).sort({ postponeCount: -1 }).select(sel).lean() as Record<string, unknown> | null;
@@ -33,6 +45,7 @@ export async function GET() {
 
     // Fallback: oldest unfinished big task
     const oldestBig = await Task.findOne({
+      ...dateFilter,
       status: { $ne: 'done' },
       size: 'big',
     }).sort({ date: 1, createdAt: 1 }).select(sel).lean() as Record<string, unknown> | null;

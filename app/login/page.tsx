@@ -1,11 +1,10 @@
 'use client';
-import { useState, FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, FormEvent, TouchEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
 function LoginForm() {
-  const router       = useRouter();
   const searchParams = useSearchParams();
   const from         = searchParams.get('from') || '/';
 
@@ -14,8 +13,14 @@ function LoginForm() {
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  // Warm up the serverless function + DB connection as soon as the login page loads,
+  // so by the time the user fills in the form the cold start is already done.
+  useEffect(() => {
+    fetch('/api/ping').catch(() => {});
+  }, []);
+
+  const doLogin = async () => {
+    if (loading) return;
     setError('');
     setLoading(true);
     try {
@@ -26,11 +31,22 @@ function LoginForm() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Login failed'); return; }
-      router.push(from);
-      router.refresh();
+      window.location.replace(from);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    doLogin();
+  };
+
+  // On mobile, handle the touch directly on touchend so the keyboard-dismiss reflow
+  // never gets a chance to move the button before the click registers.
+  const handleTouchEnd = (e: TouchEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // blocks the synthetic mouse/click events that follow touchend
+    doLogin();
   };
 
   const inputStyle: React.CSSProperties = {
@@ -112,6 +128,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
+            onTouchEnd={handleTouchEnd}
             className="w-full py-2.5 rounded-xl text-sm font-semibold transition-opacity disabled:opacity-60"
             style={{ background: 'var(--color-accent)', color: '#fff' }}
           >
